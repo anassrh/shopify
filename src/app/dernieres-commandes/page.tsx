@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from '@/components/Navbar';
 import { supabase, Commande } from '@/lib/supabase';
 import { 
@@ -24,24 +24,7 @@ export default function DernieresCommandesPage() {
   const [orderActions, setOrderActions] = useState<Record<string, 'valide' | 'refuse'>>({});
   const [rowEffects, setRowEffects] = useState<Record<string, 'success' | 'error' | 'refused' | null>>({});
 
-  useEffect(() => {
-    fetchDernieresCommandes();
-  }, [timeFilter]);
-
-  useEffect(() => {
-    setFilteredCommandes(commandes);
-  }, [commandes]);
-
-  // Récupération automatique des nouvelles commandes toutes les 30 secondes
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetchDernieresCommandes(false); // Pas de loading pour les mises à jour automatiques
-    }, 30000); // 30 secondes
-
-    return () => clearInterval(interval);
-  }, [timeFilter]);
-
-  const fetchDernieresCommandes = async (showLoading = true) => {
+  const fetchDernieresCommandes = useCallback(async (showLoading = true) => {
     try {
       if (showLoading) {
         setLoading(true);
@@ -92,7 +75,24 @@ export default function DernieresCommandesPage() {
         setLoading(false);
       }
     }
-  };
+  }, [timeFilter]);
+
+  useEffect(() => {
+    fetchDernieresCommandes();
+  }, [fetchDernieresCommandes]);
+
+  useEffect(() => {
+    setFilteredCommandes(commandes);
+  }, [commandes]);
+
+  // Récupération automatique des nouvelles commandes toutes les 30 secondes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchDernieresCommandes(false); // Pas de loading pour les mises à jour automatiques
+    }, 30000); // 30 secondes
+
+    return () => clearInterval(interval);
+  }, [fetchDernieresCommandes]);
 
   const handleActionClick = async (commandeId: string, action: 'valide' | 'refuse') => {
     try {

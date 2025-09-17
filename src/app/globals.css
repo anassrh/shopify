@@ -286,7 +286,73 @@ body {
   @apply w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold transition-all bg-black text-white border-2 border-black;
 }
 
+.btn-action-reset {
+  @apply w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold transition-all bg-gray-100 text-gray-600 border-2 border-gray-300 hover:bg-gray-200 hover:border-gray-400;
+}
+
+.btn-action-reset-active {
+  @apply w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold transition-all bg-gray-600 text-white border-2 border-gray-600;
+}
+
 /* Effet de ligne refusée */
 .row-refused {
   @apply bg-red-50 border-l-4 border-red-500;
+}
+
+/* Styles pour les champs de date */
+input[type="date"] {
+  color: #000000 !important;
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 0.375rem !important;
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  line-height: 1.25rem !important;
+  font-weight: 400 !important;
+}
+
+input[type="date"]:focus {
+  outline: none !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5) !important;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  color: #000000 !important;
+  opacity: 1 !important;
+}
+
+input[type="date"]::-webkit-datetime-edit-text {
+  color: #000000 !important;
+}
+
+input[type="date"]::-webkit-datetime-edit-month-field {
+  color: #000000 !important;
+}
+
+input[type="date"]::-webkit-datetime-edit-day-field {
+  color: #000000 !important;
+}
+
+input[type="date"]::-webkit-datetime-edit-year-field {
+  color: #000000 !important;
+}
+
+/* Empêcher les rechargements de page pour les formulaires */
+form {
+  display: contents;
+}
+
+/* Empêcher la soumission de formulaire par défaut */
+button[type="button"] {
+  cursor: pointer;
+}
+
+/* Styles pour éviter les rechargements */
+.no-reload {
+  pointer-events: auto;
+}
+
+.no-reload * {
+  pointer-events: auto;
 }

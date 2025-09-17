@@ -1,20 +1,31 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import DynamicStats from '@/components/DynamicStats';
 import OrderCharts from '@/components/OrderCharts';
+import CSVImportModal from '@/components/CSVImportModal';
+import { useCSVData } from '@/contexts/CSVDataContext';
 import { 
   ShoppingCart, 
   TrendingUp, 
   Clock, 
   CheckCircle,
   ArrowRight,
-  RefreshCw
+  RefreshCw,
+  Upload
 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function Dashboard() {
+  const [isCSVModalOpen, setIsCSVModalOpen] = useState(false);
+  const { addCSVData } = useCSVData();
+
+  const handleCSVImport = (data: any[]) => {
+    addCSVData(data);
+    console.log('Données CSV importées:', data);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -29,6 +40,13 @@ export default function Dashboard() {
               </p>
             </div>
             <div className="flex items-center space-x-3">
+              <button 
+                onClick={() => setIsCSVModalOpen(true)}
+                className="btn-secondary flex items-center space-x-2"
+              >
+                <Upload className="w-4 h-4" />
+                <span>Import CA</span>
+              </button>
               <button className="btn-secondary flex items-center space-x-2">
                 <RefreshCw className="w-4 h-4" />
                 <span>Actualiser</span>
@@ -150,6 +168,13 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Modal d'import CSV */}
+      <CSVImportModal
+        isOpen={isCSVModalOpen}
+        onClose={() => setIsCSVModalOpen(false)}
+        onImport={handleCSVImport}
+      />
     </div>
   );
 }

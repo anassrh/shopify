@@ -1,9 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from '@/components/Navbar';
+import DashboardConfigModal from '@/components/DashboardConfigModal';
 import { supabase, Shop } from '@/lib/supabase';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { 
   Search, 
   Plus, 
@@ -15,10 +17,12 @@ import {
   Filter,
   Eye,
   TrendingUp,
-  AlertCircle
+  AlertCircle,
+  X
 } from 'lucide-react';
 
 export default function MarquesPage() {
+  const router = useRouter();
   const [marques, setMarques] = useState<Shop[]>([]);
   const [filteredMarques, setFilteredMarques] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,6 +37,7 @@ export default function MarquesPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showCommissionModal, setShowCommissionModal] = useState(false);
   const [showAccessModal, setShowAccessModal] = useState(false);
+  const [showDashboardConfigModal, setShowDashboardConfigModal] = useState(false);
   const [editingMarque, setEditingMarque] = useState<Shop | null>(null);
   
   // États des formulaires
@@ -46,39 +51,36 @@ export default function MarquesPage() {
     acces: ''
   });
 
-  useEffect(() => {
-    fetchMarques();
-  }, []);
-
-  useEffect(() => {
-    filterMarques();
-  }, [marques, searchTerm, statusFilter]);
-
-  const fetchMarques = async () => {
+  const fetchMarques = async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) {
+        setLoading(true);
+      }
       setError(null);
 
-      const { data, error } = await supabase
+      // Récupérer toutes les marques (true et false)
+      const { data: allShops, error: allError } = await supabase
         .from('shop')
         .select('*')
-        .eq('is_marque', true)
         .order('nom', { ascending: true });
 
-      if (error) {
-        throw error;
+      if (allError) {
+        throw allError;
       }
 
-      setMarques(data || []);
+      // Afficher toutes les shops (marques actives et inactives)
+      setMarques(allShops || []);
     } catch (err) {
       console.error('Erreur récupération marques:', err);
       setError('Erreur lors du chargement des marques');
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+      }
     }
   };
 
-  const filterMarques = () => {
+  const filterMarques = useCallback(() => {
     let filtered = marques;
 
     // Filtre de recherche
@@ -98,9 +100,26 @@ export default function MarquesPage() {
         filtered = filtered.filter(marque => marque.is_marque === false);
       }
     }
-
+    
     setFilteredMarques(filtered);
-  };
+  }, [marques, searchTerm, statusFilter]);
+
+  useEffect(() => {
+    fetchMarques();
+  }, []);
+
+  useEffect(() => {
+    filterMarques();
+  }, [filterMarques]);
+
+  // Récupération automatique des nouvelles marques toutes les 30 secondes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchMarques(false); // Pas de loading pour les mises à jour automatiques
+    }, 30000); // 30 secondes
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleDeleteMarque = async (marqueId: string) => {
     if (!confirm('Êtes-vous sûr de vouloir supprimer cette marque ?')) {
@@ -160,6 +179,13 @@ export default function MarquesPage() {
     return { total, actifs, inactifs };
   };
 
+  const handleDashboardConfig = (sections: string[]) => {
+    // Stocker les sections sélectionnées dans localStorage
+    localStorage.setItem('dashboard2-sections', JSON.stringify(sections));
+    // Rediriger vers dashboard2
+    router.push('/dashboard2');
+  };
+
   const stats = getStats();
 
   if (loading) {
@@ -192,8 +218,11 @@ export default function MarquesPage() {
             </p>
           </div>
           <div className="flex items-center space-x-3">
+            <div className="text-sm text-gray-500">
+              Mise à jour automatique toutes les 30 secondes
+            </div>
             <button 
-              onClick={fetchMarques}
+              onClick={() => fetchMarques()}
               className="btn-secondary flex items-center space-x-2"
             >
               <RefreshCw className="w-4 h-4" />
@@ -330,8 +359,16 @@ export default function MarquesPage() {
                   <tr key={marque.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center mr-3">
-                          <Building2 className="w-5 h-5 text-gray-400" />
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center mr-3 ${
+                          marque.is_marque 
+                            ? 'bg-blue-100' 
+                            : 'bg-gray-100'
+                        }`}>
+                          {marque.is_marque ? (
+                            <Building2 className="w-5 h-5 text-blue-600" />
+                          ) : (
+                            <X className="w-5 h-5 text-gray-500" />
+                          )}
                         </div>
                         <div>
                           <div className="text-sm font-medium text-gray-900">
@@ -415,15 +452,15 @@ export default function MarquesPage() {
 
                         {/* Bouton Dashboard pour la marque 71417 */}
                         {marque.shop_id === 71417 && (
-                          <Link
-                            href="/dashboard2"
+                          <button
+                            onClick={() => setShowDashboardConfigModal(true)}
                             className="flex items-center px-3 py-2 bg-green-500 text-white rounded-lg shadow-sm hover:bg-green-600 transition-colors text-sm"
                           >
                             <svg className="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
                               <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
                             </svg>
                             Dashboard
-                          </Link>
+                          </button>
                         )}
 
                         {/* Bouton Gestion des accès */}
@@ -471,7 +508,13 @@ export default function MarquesPage() {
         </div>
         </div>
 
-        {/* Modales (à implémenter) */}
+        {/* Modales */}
+        <DashboardConfigModal
+          isOpen={showDashboardConfigModal}
+          onClose={() => setShowDashboardConfigModal(false)}
+          onConfigure={handleDashboardConfig}
+        />
+
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
