@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useDemoAuth } from '@/contexts/DemoAuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { User, LogOut } from 'lucide-react';
 
 export default function ComptePage() {
-  const { user, signOut } = useDemoAuth();
+  const { user, signOut } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const handleSignOut = async () => {
@@ -65,15 +65,6 @@ export default function ComptePage() {
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Nom complet
-                  </label>
-                  <div className="mt-1 p-3 bg-gray-50 border border-gray-300 rounded-md">
-                    <p className="text-sm text-gray-900">{user.name}</p>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Adresse email
                   </label>
                   <div className="mt-1 p-3 bg-gray-50 border border-gray-300 rounded-md">
@@ -83,19 +74,44 @@ export default function ComptePage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Rôle
+                    ID utilisateur
                   </label>
                   <div className="mt-1 p-3 bg-gray-50 border border-gray-300 rounded-md">
-                    <p className="text-sm text-gray-900 capitalize">{user.role}</p>
+                    <p className="text-sm text-gray-900 font-mono">{user.id}</p>
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    ID utilisateur
+                    Date de création
                   </label>
                   <div className="mt-1 p-3 bg-gray-50 border border-gray-300 rounded-md">
-                    <p className="text-sm text-gray-900 font-mono">{user.id}</p>
+                    <p className="text-sm text-gray-900">
+                      {new Date(user.created_at).toLocaleDateString('fr-FR', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Dernière connexion
+                  </label>
+                  <div className="mt-1 p-3 bg-gray-50 border border-gray-300 rounded-md">
+                    <p className="text-sm text-gray-900">
+                      {user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleDateString('fr-FR', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      }) : 'Non disponible'}
+                    </p>
                   </div>
                 </div>
               </div>

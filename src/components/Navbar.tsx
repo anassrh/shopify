@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useDemoAuth } from '@/contexts/DemoAuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { 
   Home, 
   ShoppingCart, 
@@ -18,7 +18,7 @@ import {
 
 const Navbar = () => {
   const pathname = usePathname();
-  const { user, signOut } = useDemoAuth();
+  const { user, signOut } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const navItems = [
@@ -84,13 +84,10 @@ const Navbar = () => {
               </div>
               <div className="flex-1 text-left">
                 <p className="text-sm font-medium text-white truncate">
-                  {user.name}
-                </p>
-                <p className="text-xs text-gray-400 truncate">
                   {user.email}
                 </p>
-                <p className="text-xs text-blue-400 capitalize">
-                  {user.role}
+                <p className="text-xs text-gray-400 truncate">
+                  Utilisateur connecté
                 </p>
               </div>
               <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showUserMenu ? 'rotate-180' : ''}`} />

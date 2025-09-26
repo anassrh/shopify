@@ -4,15 +4,14 @@ import React, { useState } from 'react';
 import { XCircle, Mail, Lock, User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
-interface AuthModalProps {
+interface SimpleAuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
-  const { signIn, signUp } = useAuth();
-  const [isLogin, setIsLogin] = useState(true);
+export default function SimpleAuthModal({ isOpen, onClose, onSuccess }: SimpleAuthModalProps) {
+  const { signIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -26,34 +25,18 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     setError(null);
 
     try {
-      if (isLogin) {
-        // Connexion
-        const { error } = await signIn(email, password);
-        if (error) throw error;
-
-        console.log('Connexion réussie');
-        onSuccess();
-        onClose();
-      } else {
-        // Inscription
-        const { error } = await signUp(email, password);
-        if (error) {
-        // Gérer les erreurs spécifiques
-        if (error.message.includes('Database error')) {
-          throw new Error('Erreur de configuration Supabase. Vérifiez la configuration dans le dashboard Supabase.');
-        } else if (error.message.includes('User already registered')) {
-          throw new Error('Cet email est déjà utilisé. Essayez de vous connecter.');
-        } else if (error.message.includes('Invalid login credentials')) {
+      const { error } = await signIn(email, password);
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
           throw new Error('Email ou mot de passe incorrect.');
         } else {
           throw error;
         }
-        }
-
-        alert('Inscription réussie ! Vous pouvez maintenant vous connecter.');
-        onSuccess();
-        onClose();
       }
+
+      console.log('Connexion réussie');
+      onSuccess();
+      onClose();
     } catch (error: any) {
       console.error('Erreur auth:', error);
       setError(error.message || 'Une erreur est survenue');
@@ -74,11 +57,29 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             <User className="w-8 h-8 text-white" />
           </div>
           <h2 className="text-3xl font-bold text-white mb-2">
-            {isLogin ? 'Connexion' : 'Inscription'}
+            Connexion
           </h2>
           <p className="text-blue-200 text-sm">
-            {isLogin ? 'Accédez à votre espace de travail' : 'Créez votre compte'}
+            Accédez à votre espace de travail
           </p>
+        </div>
+
+        {/* Comptes de test */}
+        <div className="mb-6 p-4 bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded-xl border border-blue-400/30 backdrop-blur-sm">
+          <h3 className="text-sm font-semibold text-blue-100 mb-3 flex items-center">
+            <div className="w-2 h-2 bg-blue-400 rounded-full mr-2 animate-pulse"></div>
+            Comptes de test
+          </h3>
+          <div className="text-xs text-blue-200 space-y-2">
+            <div className="flex justify-between items-center bg-white/10 rounded-lg p-2">
+              <span className="font-medium">Test 1</span>
+              <span className="text-blue-300">test@example.com</span>
+            </div>
+            <div className="flex justify-between items-center bg-white/10 rounded-lg p-2">
+              <span className="font-medium">Test 2</span>
+              <span className="text-blue-300">admin@test.com</span>
+            </div>
+          </div>
         </div>
 
         {error && (
@@ -122,7 +123,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                 id="password"
                 name="password"
                 type="password"
-                autoComplete={isLogin ? 'current-password' : 'new-password'}
+                autoComplete="current-password"
                 required
                 className="w-full px-4 py-3 pl-12 bg-white/10 border border-blue-400/30 rounded-xl text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400 transition-all duration-200 backdrop-blur-sm"
                 placeholder="••••••••"
@@ -144,11 +145,11 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  {isLogin ? 'Connexion...' : 'Inscription...'}
+                  Connexion...
                 </>
               ) : (
                 <>
-                  {isLogin ? 'Se connecter' : 'S\'inscrire'}
+                  Se connecter
                   <div className="w-2 h-2 bg-white/30 rounded-full ml-2 animate-pulse"></div>
                 </>
               )}
@@ -157,13 +158,9 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         </form>
 
         <div className="mt-8 text-center">
-          <button
-            type="button"
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-blue-200 hover:text-white font-medium transition-colors duration-200 hover:underline"
-          >
-            {isLogin ? 'Pas encore de compte ? S\'inscrire' : 'Déjà un compte ? Se connecter'}
-          </button>
+          <p className="text-blue-200 text-sm">
+            Pour créer un compte, contactez l'administrateur
+          </p>
         </div>
       </div>
     </div>

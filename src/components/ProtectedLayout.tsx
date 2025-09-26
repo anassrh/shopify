@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import AuthModal from './AuthModal';
+import SimpleAuthModal from './SimpleAuthModal';
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;
@@ -42,7 +42,7 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
           </button>
         </div>
 
-        <AuthModal
+        <SimpleAuthModal
           isOpen={showAuthModal}
           onClose={() => setShowAuthModal(false)}
           onSuccess={() => setShowAuthModal(false)}
