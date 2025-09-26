@@ -18,13 +18,15 @@ export default function Dashboard2() {
 
   // Charger les sections sélectionnées depuis localStorage
   useEffect(() => {
-    const savedSections = localStorage.getItem('dashboard2-sections');
-    if (savedSections) {
-      try {
-        const sections = JSON.parse(savedSections);
-        setSelectedSections(sections);
-      } catch (error) {
-        console.error('Erreur lors du chargement des sections:', error);
+    if (typeof window !== 'undefined') {
+      const savedSections = localStorage.getItem('dashboard2-sections');
+      if (savedSections) {
+        try {
+          const sections = JSON.parse(savedSections);
+          setSelectedSections(sections);
+        } catch (error) {
+          console.error('Erreur lors du chargement des sections:', error);
+        }
       }
     }
   }, []);

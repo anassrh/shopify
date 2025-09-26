@@ -181,7 +181,9 @@ export default function MarquesPage() {
 
   const handleDashboardConfig = (sections: string[]) => {
     // Stocker les sections sélectionnées dans localStorage
-    localStorage.setItem('dashboard2-sections', JSON.stringify(sections));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('dashboard2-sections', JSON.stringify(sections));
+    }
     // Rediriger vers dashboard2
     router.push('/dashboard2');
   };

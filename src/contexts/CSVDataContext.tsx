@@ -24,19 +24,23 @@ export function CSVDataProvider({ children }: { children: React.ReactNode }) {
 
   // Charger les données depuis le localStorage au montage
   useEffect(() => {
-    const savedData = localStorage.getItem('csvData');
-    if (savedData) {
-      try {
-        setCsvData(JSON.parse(savedData));
-      } catch (error) {
-        console.error('Erreur lors du chargement des données CSV:', error);
+    if (typeof window !== 'undefined') {
+      const savedData = localStorage.getItem('csvData');
+      if (savedData) {
+        try {
+          setCsvData(JSON.parse(savedData));
+        } catch (error) {
+          console.error('Erreur lors du chargement des données CSV:', error);
+        }
       }
     }
   }, []);
 
   // Sauvegarder les données dans le localStorage à chaque changement
   useEffect(() => {
-    localStorage.setItem('csvData', JSON.stringify(csvData));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('csvData', JSON.stringify(csvData));
+    }
   }, [csvData]);
 
   const addCSVData = (data: CSVData[]) => {
@@ -95,3 +99,5 @@ export function useCSVData() {
   }
   return context;
 }
+
+

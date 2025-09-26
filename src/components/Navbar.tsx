@@ -1,19 +1,25 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { useDemoAuth } from '@/contexts/DemoAuthContext';
 import { 
   Home, 
   ShoppingCart, 
   Package, 
   Building2, 
-  Users
+  Users,
+  LogOut,
+  User,
+  ChevronDown
 } from 'lucide-react';
 
 const Navbar = () => {
   const pathname = usePathname();
+  const { user, signOut } = useDemoAuth();
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   const navItems = [
     { href: '/', label: 'Dashboard', icon: Home },
@@ -64,6 +70,47 @@ const Navbar = () => {
           );
         })}
       </nav>
+
+      {/* User Info */}
+      {user && (
+        <div className="absolute bottom-20 left-0 right-0 p-4 border-t border-gray-700">
+          <div className="relative">
+            <button
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className="w-full flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-800 transition-colors"
+            >
+              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                <User className="w-4 h-4 text-white" />
+              </div>
+              <div className="flex-1 text-left">
+                <p className="text-sm font-medium text-white truncate">
+                  {user.name}
+                </p>
+                <p className="text-xs text-gray-400 truncate">
+                  {user.email}
+                </p>
+                <p className="text-xs text-blue-400 capitalize">
+                  {user.role}
+                </p>
+              </div>
+              <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showUserMenu ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* User Menu Dropdown */}
+            {showUserMenu && (
+              <div className="absolute bottom-full left-0 right-0 mb-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+                <button
+                  onClick={signOut}
+                  className="w-full flex items-center space-x-2 px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors rounded-lg"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Se déconnecter</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-700">

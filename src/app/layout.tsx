@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { CSVDataProvider } from '@/contexts/CSVDataContext';
+import { DemoAuthProvider } from '@/contexts/DemoAuthContext';
+import DemoProtectedLayout from '@/components/DemoProtectedLayout';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -25,9 +27,13 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className={inter.className}>
-        <CSVDataProvider>
-          {children}
-        </CSVDataProvider>
+        <DemoAuthProvider>
+          <CSVDataProvider>
+            <DemoProtectedLayout>
+              {children}
+            </DemoProtectedLayout>
+          </CSVDataProvider>
+        </DemoAuthProvider>
       </body>
     </html>
   );
