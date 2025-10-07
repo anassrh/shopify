@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDemoAuth } from '@/contexts/DemoAuthContext';
 import DemoAuthModal from './DemoAuthModal';
+import Navbar from './Navbar';
 import { useRouter, usePathname } from 'next/navigation';
 
 export default function DemoProtectedLayout({ children }: { children: React.ReactNode }) {
@@ -49,5 +50,10 @@ export default function DemoProtectedLayout({ children }: { children: React.Reac
     );
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <Navbar />
+      {children}
+    </>
+  );
 }

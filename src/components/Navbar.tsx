@@ -13,7 +13,8 @@ import {
   Users,
   LogOut,
   User,
-  ChevronDown
+  ChevronDown,
+  ShoppingBag
 } from 'lucide-react';
 
 const Navbar = () => {
@@ -25,6 +26,7 @@ const Navbar = () => {
     { href: '/', label: 'Dashboard', icon: Home },
     { href: '/ventes', label: 'Commandes à Checker', icon: ShoppingCart },
     { href: '/dernieres-commandes', label: 'Commandes à Valider', icon: Package },
+    { href: '/shopify-commandes', label: 'Commandes Shopify', icon: ShoppingBag },
     { href: '/marques', label: 'Marques', icon: Building2 },
     { href: '/compte', label: 'Comptes', icon: Users },
   ];
